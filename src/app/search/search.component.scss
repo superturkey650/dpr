@@ -1,0 +1,31 @@
+.titleWrapper {
+    text-align: center;
+}
+.title {
+    display: inline-block;
+}
+
+.searchWrapper {
+    text-align: center;
+}
+.searchForm {
+    display: inline-block;
+}
+
+.search_field {
+    width: 300px;
+    margin-right: 15px;
+}
+
+.movie_list {
+    list-style-type: none;
+}
+.movie {
+    border-bottom-style: solid;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+}
+
+.movie_metadata {
+    margin-bottom: 10px;
+}
