@@ -25,5 +25,8 @@ exports.handler = async () => {
     
     const token = response.token;
     console.log(`token: ${token}`);
-    return token;
+    return {
+        'StatusCode': 200,
+        'Payload': JSON.stringify(token)
+    };
 }

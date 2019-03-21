@@ -1,0 +1,21 @@
+{
+  "name": "search-rarbg",
+  "version": "1.0.0",
+  "description": "search rarbg for torrents given an imdbid",
+  "main": "index.js",
+  "scripts": {
+    "zip": "zip -r ../search-rarbg .",
+    "test": "node test.js"
+  },
+  "author": "Jared Mosley",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^5.15.3",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0"
+  }
+}

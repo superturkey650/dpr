@@ -4,6 +4,7 @@
   "description": "get authorization token from rarbg",
   "main": "index.js",
   "scripts": {
+    "zip": "zip -r ../get-rarbg-token .",
     "test": "node test.js"
   },
   "author": "Jared Mosley",

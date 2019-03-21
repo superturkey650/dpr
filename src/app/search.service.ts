@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 
 import {
   RARBGResponse,
@@ -22,6 +22,9 @@ interface Quality {
   providedIn: 'root'
 })
 export class SearchService {
+  private rarbgTokenLambdaURL = 'https://ccc2iwzvt8.execute-api.us-east-2.amazonaws.com/dev/get-rarbg-token';
+  private rarbgSearchLambdaURL = 'https://ccc2iwzvt8.execute-api.us-east-2.amazonaws.com/dev/search-rarbg';
+
   private omdbURL = 'http://www.omdbapi.com/?apikey=337b47b8&';
   public omdbResults$: BehaviorSubject<OMDBResult[]>;
 
@@ -53,25 +56,21 @@ export class SearchService {
   searchRARBG(id: string): void {
     this._updateSession();
     console.log('searching RARBG for ID', id);
-    const params = new HttpParams()
-      .set('mode', 'search')
-      .set('search_imdb', id)
-      .set('app_id', 'ttkms_ptbmatm')
-      .set('token', this.session.token);
-    this.http.get<RARBGResponse>(this.rarbgURL, { params }).subscribe(res => {
-      console.log(res.torrent_results);
-      const sorted = this.sort(res.torrent_results);
+    const params = {
+      imdbID: id,
+      token: this.session.token,
+    }
+    this.http.post<any>(this.rarbgSearchLambdaURL, params).subscribe(resp => {
+      console.log(resp);
+      const res = JSON.parse(resp);
+      const sorted = this.sort(res);
       this.rarbgResults$.next(sorted);
     });
   }
 
   private _updateSession(): void {
     if (!this._isValidToken()) {
-      const params = new HttpParams()
-        .set('get_token', 'get_token')
-        .set('app_id', 'ttkms_ptbmatm');
-      this.http.get<RARBGToken>(this.rarbgURL, { params })
-      .subscribe(response => this.session.token = response.token);
+      this.http.get<any>(this.rarbgTokenLambdaURL).subscribe(response => this.session.token = JSON.parse(response.Payload));
     }
   }
 
