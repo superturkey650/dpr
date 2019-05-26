@@ -1,0 +1,9 @@
+<div class="movie" *ngIf="(getResult$() | async) as result">
+  <img class="movie_poster" [src]="result.Poster" border="5">
+  <h3 class="movie_metadata">{{ result.Title }} ({{ result.Year }})</h3>
+
+  <app-tv-result *ngIf="isTV(result)" [result]="result"></app-tv-result>
+  <app-tv-download *ngIf="isTV(result)" [rarbgResults]="" [torrents]="" (download)="download(result, $event)"></app-tv-download>
+  <app-movie-result *ngIf="isMovie(result)" [result]="result"></app-movie-result>
+  <app-movie-download *ngIf="isMovie(result)"></app-movie-download>
+</div>

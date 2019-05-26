@@ -1,0 +1,23 @@
+<div *ngIf="download">
+  <button
+    class="download_torrent_button"
+    disabled>
+    Downloading...
+  </button>
+  <app-progress [torrent]="download$ | async"></app-progress>
+</div>
+
+<div *ngIf="(getTorrents$() | async)?.length != 0 && !(getDownload(result) | async)">
+  <input *ngIf="hasTorrentQuality('2160')" type="radio" value="2160p" [(ngModel)]="quality"> 2160p <br>
+  <input *ngIf="hasTorrentQuality('1080')" type="radio" value="1080p" [(ngModel)]="quality"> 1080p <br>
+  <input *ngIf="hasTorrentQuality('720')" type="radio" value="720p" [(ngModel)]="quality"> 720p <br>
+</div>
+
+<br>
+
+<button
+  class="download_torrent_button"
+  *ngIf="(getTorrents$() | async)?.length != 0 && !(getDownload(result) | async)"
+  (click)="download(result)">
+  Download
+</button>

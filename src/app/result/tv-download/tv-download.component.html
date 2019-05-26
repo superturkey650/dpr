@@ -1,0 +1,18 @@
+<ul>
+  <li *ngFor="let season of range(seasons)">
+    <div>
+      <h2>Season {{ season }}</h2>
+      <app-download *ngIf="hasSeason(season)" [torrents]="getSeasonTorrents(season)" ></app-download>
+      <app-manage-download *ngIf="hasSeason(season)" [active]="getActiveSeason(season)"></app-manage-download>
+      <ul>
+        <li *ngFor="let episode of range(getMaxEpisodes(season))">
+          <div>
+            <h2>Episode {{ episode }}</h2>
+            <app-download *ngIf="hasEpisode(season, episode)"" torrents="getEpisodeTorrents(season, episode)"></app-download>
+            <app-manage-download *ngIf="hasEpisode(season, episode)" [active]="getActiveEpisode(season, episode)"></app-manage-download>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </li>
+</ul>

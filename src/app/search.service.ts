@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
-import {
-  RARBGResponse,
-  RARBGResult,
-  RARBGToken
-} from './models/result.model';
+import { RARBGResult } from './models/result.model';
 
 import {
   OMDBResponse,
   OMDBResult
 } from './models/result.model';
+import { map } from 'rxjs/operators';
 
 interface Quality {
   format: string;
@@ -24,12 +21,10 @@ interface Quality {
 export class SearchService {
   private rarbgTokenLambdaURL = 'https://ccc2iwzvt8.execute-api.us-east-2.amazonaws.com/dev/get-rarbg-token';
   private rarbgSearchLambdaURL = 'https://ccc2iwzvt8.execute-api.us-east-2.amazonaws.com/dev/search-rarbg';
+  public rarbgResults$: BehaviorSubject<RARBGResult[]>;
 
   private omdbURL = 'http://www.omdbapi.com/?apikey=337b47b8&';
   public omdbResults$: BehaviorSubject<OMDBResult[]>;
-
-  private rarbgURL = 'http://localhost:1337/torrentapi.org/pubapi_v2.php';
-  public rarbgResults$: BehaviorSubject<RARBGResult[]>;
 
   private session = {
     token: '',
@@ -37,45 +32,44 @@ export class SearchService {
   };
 
   constructor(private http: HttpClient) {
-    this._updateSession();
     this.omdbResults$ = new BehaviorSubject<OMDBResult[]>([]);
     this.rarbgResults$ = new BehaviorSubject<RARBGResult[]>([]);
   }
 
-  private _buildOMDBURL(term: string): string {
-    if (!term.trim()) { console.log('empty search'); }
+  private _buildOMDBURL(mode: string, term: string): string {
     function clean(dirty: string) { return dirty.replace(/ /g, '+'); }
-    return this.omdbURL.concat('s='.concat(clean(term)));
+    return this.omdbURL.concat(`${mode}=`.concat(clean(term)));
   }
 
   searchOMDB(term: string): void {
-    const url: string = this._buildOMDBURL(term);
+    const url: string = this._buildOMDBURL('s', term);
     this.http.get<OMDBResponse>(url).subscribe(res => this.omdbResults$.next(res.Search));
   }
 
-  searchRARBG(id: string): void {
-    this._updateSession();
-    console.log('searching RARBG for ID', id);
-    const params = {
-      imdbID: id,
-      token: this.session.token,
-    }
-    this.http.post<any>(this.rarbgSearchLambdaURL, params).subscribe(resp => {
-      console.log(resp);
-      const res = JSON.parse(resp);
-      const sorted = this.sort(res);
-      this.rarbgResults$.next(sorted);
+  findOMDB(imdbID: string): void {
+    const url: string = this._buildOMDBURL('i', imdbID);
+    this.http.get<OMDBResult>(url).subscribe(res => this.omdbResults$.next([res]));
+  }
+
+  searchRARBG(imdbID: string): void {
+    this.getToken().subscribe((token: string) => {
+      const params = { imdbID, token };
+      console.log(`searching RARBG: ${JSON.stringify(params)}`);
+      this.http.post<any>(this.rarbgSearchLambdaURL, params)
+        .subscribe(resp => this.rarbgResults$.next(resp.Payload ? JSON.parse(resp.Payload) : []));
     });
   }
 
-  private _updateSession(): void {
-    if (!this._isValidToken()) {
-      this.http.get<any>(this.rarbgTokenLambdaURL).subscribe(response => this.session.token = JSON.parse(response.Payload));
+  private getToken(): Observable<string> {
+    if (!this.isValidToken(this.session.timestamp)) {
+      return this.http.get<any>(this.rarbgTokenLambdaURL)
+        .pipe(map(response => JSON.parse(response.Payload)));
     }
+    return of(this.session.token);
   }
 
-  private _isValidToken(): boolean {
-    return (Date.now() - this.session.timestamp) < 600;
+  private isValidToken(timestamp: number): boolean {
+    return (Date.now() - timestamp) < 600;
   }
 
   private sort(results: RARBGResult[]): RARBGResult[] {
@@ -89,8 +83,8 @@ export class SearchService {
     });
 
     return results.filter((result: RARBGResult) => {
-      const hasResolution = qualities.some((q: Quality) => result.filename.toLowerCase().includes(q.resolution));
-      const hasFormat = qualities.some((q: Quality) => result.filename.toLowerCase().includes(q.resolution));
+      const hasResolution = qualities.some((q: Quality) => result.title.toLowerCase().includes(q.resolution));
+      const hasFormat = qualities.some((q: Quality) => result.title.toLowerCase().includes(q.format));
       return hasFormat && hasResolution;
     });
   }

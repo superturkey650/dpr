@@ -1,0 +1,12 @@
+<app-search *ngIf="term" [term]="term"></app-search>
+
+<div>
+  <ul class="movie_list" *ngIf="term">
+    <li class="movieWrapper" *ngFor="let result of getResults$() | async | slice:0:5">
+        <div class="movie" (click)="details(result.imdbID)">
+            <img class="movie_poster" [src]="result.Poster" border="5">
+            <h3 class="movie_metadata">{{ result.Title }} ({{ result.Year }})</h3>
+        </div>
+    </li>
+  </ul>
+</div>

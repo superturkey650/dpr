@@ -1,39 +1,11 @@
 <div class="titleWrapper">
-    <h1 class="title">Movie Search</h1> 
+  <h1 class="title">dittodl</h1>
 </div>
 
 <div class="searchWrapper">
-    <div class="searchForm">
-      <input class="search_field" #query type="text" name="query" (keyup.enter)="movieSearch(query.value)" autofocus>
-      <button class="search_button" (click)="movieSearch(query.value)">search</button>    
-    </div>
+  <div class="searchForm">
+    <input class="search_field" #query type="text" name="query" (keyup.enter)="search(query.value)" [value]="term"
+      autofocus>
+    <button class="search_button" (click)="search(query.value)">search</button>
+  </div>
 </div>
-
-<ul class="movie_list" *ngIf="getMovies$() | async">
-  <li class="movieWrapper" *ngFor="let movie of getMovies$() | async | slice:0:5">
-    <div class="movie">
-        <img class="movie_poster" [src]="movie.Poster">
-        <h4 class="movie_metadata">{{ movie.Title }} ({{ movie.Year }})</h4>
-        <select
-          class="torrent_dropdown"
-          *ngIf="(getTorrents$() | async)?.length != 0 && movieSelectionID === movie.imdbID"
-          [(ngModel)]="torrentSelection"
-          multiple
-          [size]="(getTorrents$() | async).length + 1"
-          style="height: 100%;"
-          placeholder="select a torrent">
-          <option value="" disabled>ordered best to worst | ctrl/cmd + click for multiple</option>
-          <option class="torrent" *ngFor="let torrent of getTorrents$() | async" [ngValue]="torrent">
-            {{ torrent.filename }}
-          </option>
-        </select>
-        <button class="view_torrents_button" *ngIf="(getTorrents$() | async)?.length === 0 || movieSelectionID != movie.imdbID" (click)="torrentSearch(movie.imdbID)">View Torrents</button>
-        <button
-          class="download_torrent_button"
-          *ngIf="(getTorrents$() | async)?.length != 0 && movieSelectionID === movie.imdbID"
-          (click)="log(movie)">
-          Download
-        </button>
-    </div>
-  </li>
-</ul>

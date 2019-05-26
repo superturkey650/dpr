@@ -1,0 +1,6 @@
+<div *ngIf="torrent">
+  <app-progress [torrent]="torrent"></app-progress>
+  <button *ngIf="isActive()" (click)="remove()">remove</button>
+  <button *ngIf="isPaused()" (click)="resume()">resume</button>
+  <button *ngIf="isActive()" (click)="pause()">pause</button>
+</div>

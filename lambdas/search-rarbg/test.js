@@ -1,10 +1,8 @@
 const { handler } = require('./index.js');
 
-const event =  {
-    queryStringParameters: {
-        imdbID: 'tt0068646',
-        token: '3rfujwd9qz'
-    }
-}
+const event = {
+  imdbID: 'tt0944947',
+  token: 'ar3hbp1i25',
+};
 
 handler(event);
