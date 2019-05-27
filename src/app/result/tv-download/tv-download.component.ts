@@ -64,7 +64,7 @@ export class TvDownloadComponent implements OnInit {
 
   getActiveEpisode(season: number, episode: number): Torrent {
     const fseason: string = season > 10 ? `0${season}` : `${season}`;
-    const fepisode: string = episode < 10 ? `0${episode}`: `${episode}`;
+    const fepisode: string = episode < 10 ? `0${episode}` : `${episode}`;
     return this.torrents.find((torrent: Torrent) => torrent.name.includes(`${fseason}${fepisode}`));
   }
 
